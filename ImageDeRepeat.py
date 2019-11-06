@@ -21,26 +21,28 @@ def getfeature(img):
     vx = [[0 for i in range(5)] for j in range(len(img))]
     for currIndex, X in enumerate(img):
 
-        nch = X.shape[-1]
-        for ch in range(nch):
-            X = X.astype(np.float64)
+        try:
+            nch = X.shape[-1]
+            for ch in range(nch):
+                X = X.astype(np.float64)
 
-            dmin, dmax = dtype_range[X.dtype.type]
-            data_range = dmax - dmin
+                dmin, dmax = dtype_range[X.dtype.type]
+                data_range = dmax - dmin
 
-            ndim = X[..., ch].ndim
+                ndim = X[..., ch].ndim
 
-            NP = win_size ** ndim
+                NP = win_size ** ndim
 
-            cov_norm = NP / (NP - 1)  # sample covariance
+                cov_norm = NP / (NP - 1)  # sample covariance
 
-            filter_func = uniform_filter
+                filter_func = uniform_filter
 
-            ux[currIndex][ch] = filter_func(X[..., ch], size=win_size)
-            uxx[currIndex][ch] = filter_func(X[..., ch] * X[..., ch], size=win_size)
+                ux[currIndex][ch] = filter_func(X[..., ch], size=win_size)
+                uxx[currIndex][ch] = filter_func(X[..., ch] * X[..., ch], size=win_size)
 
-            vx[currIndex][ch] = cov_norm * (uxx[currIndex][ch] - ux[currIndex][ch] * ux[currIndex][ch])
-
+                vx[currIndex][ch] = cov_norm * (uxx[currIndex][ch] - ux[currIndex][ch] * ux[currIndex][ch])
+        except Exception:
+            continue
     return ux, uxx, vx
 
 
@@ -147,8 +149,6 @@ def calculate(img, data, begin, end, label, deletelist, ux, uxx, vx):
                     deletelist[currIndex2] = 1
         if currIndex % 10 == 0:
             deleteall(data, deletelist)  # 一边运行一边删除
-        print("完成搜索", data[currIndex])
-    print("process" + str(label) + " amount:" + str(num))
 
 
 def deletesimilarity(pathlist):
@@ -178,7 +178,6 @@ def deletesimilarity(pathlist):
                     math.sqrt(1 + 8 * (i + 1) * (loclength[i + 1] ** 2 + loclength[i + 1]) / 2) - 1)))
     for i in range(processnum + 1):
         loc[i] = num - loclength[processnum - i]
-    print(loc)
 
     # 添加线程
     for i in range(processnum):
@@ -197,7 +196,12 @@ class DeRepeat:
         pass
 
     def deRepeat(self):
-        deletesimilarity(self.image_filepathes)
+        if len(self.image_filepathes)<1:
+            return
+        try:
+            deletesimilarity(self.image_filepathes)
+        except Exception:
+            pass
         for filepath in self.image_filepathes:
             DBAPI.setDownloadFlagByFilepath(filepath, DBAPI.DOWNLOAD_FLAG_NO_REPEAT)
         pass

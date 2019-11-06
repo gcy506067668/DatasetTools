@@ -20,7 +20,7 @@ def Find(url, limit):
         try:
             Result = requests.get(Url, timeout=7)
         except BaseException:
-            t = t + 20
+            t = t + 60
             continue
         else:
             result = Result.text
@@ -30,7 +30,7 @@ def Find(url, limit):
                 break
             else:
                 List.append(pic_url)
-                t = t + 20
+                t = t + 60
         if s > limit:
             break
     return List, s
@@ -41,11 +41,15 @@ def goToFind(keys, limit):
 
         url = 'http://image.baidu.com/search/flip?tn=baiduimage&ie=utf-8&word=' + key + '&pn='
         html_url_list, pic_count = Find(url, limit)
-        for urls in html_url_list:
-            for url in urls:
+        html_length = str(len(html_url_list))
+        for u_index, urls in enumerate(html_url_list):
+            length = str(len(urls))
+            for index, url in enumerate(urls):
                 if not DBAPI.addUrl(url, key):
-                    print("URL已存在："+url)
-
+                    print("\033[35m\r["+str(u_index+1)+"/"+html_length+"-->"+str(index+1)+"/"+length+"] URL已存在："+url+"\033[0m", end="", flush=True)
+                else:
+                    print("\033[35m\r[" + str(u_index + 1) + "/" + html_length + "-->" + str(
+                        index + 1) + "/" + length + "] \033[0m", end="", flush=True)
 
 
 

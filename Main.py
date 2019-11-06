@@ -16,7 +16,7 @@ def mkdir(path):
 
 
 if __name__ == '__main__':
-    savepath = "/home/letmesleep/data/cartoon/cartoon_with_people_in/baidu_web_cw"
+    savepath = "/home/letmesleep/data/test"
     mkdir(savepath)
 
     # key_words = ['夜市', '集贸市场','观众','婚礼现场']
@@ -28,19 +28,18 @@ if __name__ == '__main__':
     #20191103
     # key_words = ['卡通脸', '漫画脸', '动漫古风']
     # key_words = ['漫画男人形象', '漫画女人形象', '漫画小孩形象']
-    key_words = ['漫画', '']
+    key_words = ['可爱']
 
 
-    limit = 8000
+    limit = 40
 
     WebCrawler.goToFind(key_words, limit)
-
-    Download().download(savepath)
-
+    print("\r爬取完毕，正在下载")
+    Download(savepath).downloadMulThread(5)
+    print("\r下载完毕，正在清理")
     clean()
-
+    print("\r清理完毕，正在去重")
     DeRepeat().deRepeat()
+    print("\rdone")
 
-    # Download().downloadByKeys(key_words, savepath)
-    Download().download(savepath)
 
