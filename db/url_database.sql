@@ -26,6 +26,7 @@ AUTO_INCREMENT=1 ;
 CREATE TABLE download_record(
     d_id            INT NOT NULL AUTO_INCREMENT,
     d_file_flag     INT DEFAULT 0,
+    d_label_id      INT DEFAULT 0,
     d_url           TEXT,
     d_filepath      TEXT,
     d_downloader    VARCHAR(10),

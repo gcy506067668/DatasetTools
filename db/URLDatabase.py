@@ -176,6 +176,11 @@ class DB:
         sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=1"
         return DB.executeWithReturn(sql)
 
+    @staticmethod
+    def findSameLableThatDeRepeated():
+        sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=2"
+        return DB.executeWithReturn(sql)
+
     pass
 
 
@@ -219,6 +224,17 @@ class DBAPI:
     @staticmethod
     def getImageToDerepeat():
         q_res = DB.findAllToDeRepeat()
+        filepathes = []
+        urls = []
+        for item in q_res:
+            filepathes.append(str(item["d_filepath"], encoding="utf8"))
+            urls.append(str(item["d_url"], encoding='utf8'))
+        return urls, filepathes
+        pass
+
+    @staticmethod
+    def getImageDerepeated():
+        q_res = DB.findSameLableThatDeRepeated()
         filepathes = []
         urls = []
         for item in q_res:
