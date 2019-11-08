@@ -1,6 +1,6 @@
 import re
 import requests
-from db.URLDatabase import DBAPI
+from db.DBOperator import DBUrl
 
 download_pic_index = 0
 
@@ -42,10 +42,11 @@ def goToFind(keys, limit):
         url = 'http://image.baidu.com/search/flip?tn=baiduimage&ie=utf-8&word=' + key + '&pn='
         html_url_list, pic_count = Find(url, limit)
         html_length = str(len(html_url_list))
+        dbUrl = DBUrl(key)
         for u_index, urls in enumerate(html_url_list):
             length = str(len(urls))
             for index, url in enumerate(urls):
-                if not DBAPI.addUrl(url, key):
+                if not dbUrl.addURL(url):
                     print("\033[35m\r["+str(u_index+1)+"/"+html_length+"-->"+str(index+1)+"/"+length+"] URL已存在："+url+"\033[0m", end="", flush=True)
                 else:
                     print("\033[35m\r[" + str(u_index + 1) + "/" + html_length + "-->" + str(

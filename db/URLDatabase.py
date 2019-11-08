@@ -161,27 +161,25 @@ class DB:
     @staticmethod
     def addDownloadRecord(url, filepath):
         sql = "insert into download_record(d_file_flag,d_url,d_filepath,d_downloader,d_d_time) values (0,'" + url + "','" + filepath + "','" + DBConfig.username + "'," + str(
-            int(
-                time.time())) + ");"
+            int(time.time())) + ");"
         DB.execute(sql)
         pass
 
     @staticmethod
     def findAllToDeDamage():
-        sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=0"
+        sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=0;"
         return DB.executeWithReturn(sql)
 
     @staticmethod
     def findAllToDeRepeat():
-        sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=1"
+        sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=1;"
         return DB.executeWithReturn(sql)
 
     @staticmethod
     def findSameLableThatDeRepeated():
-        sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=2"
+        sql = "select d_url,d_filepath from download_record where d_downloader='" + DBConfig.username + "' and d_file_flag=2;"
         return DB.executeWithReturn(sql)
 
-    pass
 
 
 class DBAPI:
@@ -206,6 +204,7 @@ class DBAPI:
         set_value = " u_flag=1 "
         where = " where u_url='" + url + "'"
         DB.update(table_name, set_value, where)
+
         DB.addDownloadRecord(url, savepath)
         pass
 
@@ -244,7 +243,7 @@ class DBAPI:
         pass
 
     DOWNLOAD_FLAG_DAMAGE = -1
-    DOWNLOAD_FLAG_REPEAT = -1
+    DOWNLOAD_FLAG_REPEAT = -2
     DOWNLOAD_FLAG_NO_DAMAGE = 1
     DOWNLOAD_FLAG_NO_REPEAT = 2
 
@@ -332,3 +331,22 @@ class DBAPI:
         DB.execute(sql)
         return True
         pass
+
+    @staticmethod
+    def deleteAllData():
+        """清除所有数据，谨慎使用"""
+        sql = "delete from urls;"
+        DB.execute(sql)
+        sql = "delete from labels;"
+        DB.execute(sql)
+        sql = "delete from url_label;"
+        DB.execute(sql)
+        sql = "delete from download_record"
+        DB.execute(sql)
+        pass
+
+
+#
+if __name__ == '__main__':
+    # DBAPI.deleteAllData()
+    pass

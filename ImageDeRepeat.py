@@ -13,7 +13,7 @@ from skimage._shared.utils import warn
 
 from multiprocessing import Process, Array
 
-from db.URLDatabase import DBAPI
+from db.DBOperator import DBDownload
 
 
 def getfeature(img):
@@ -120,6 +120,10 @@ def readall(data, deletelist):
             continue
         tmp = cv2.resize(tmp, (46, 46), interpolation=cv2.INTER_CUBIC)  # 缩放图片
         img[currIndex] = tmp
+        for index, item in enumerate(img):
+            if item is 0 or item is None:
+                print(data[index])
+
     return img
 
 
@@ -131,11 +135,13 @@ def deleteall(data, deletelist):
                 pass
             except BaseException:
                 continue
+        else:
+            DBDownload().updateFlag(DBDownload.DOWNLOAD_FLAG_NO_SELFREPEAT, os.path.join(data[index]))
 
 
 def delete(filename):
     '''删除文件'''
-    DBAPI.setDownloadFlagByFilepath(filename,DBAPI.DOWNLOAD_FLAG_REPEAT)
+    DBDownload().updateFlag(DBDownload.DOWNLOAD_FLAG_REPEAT, filename)
     os.remove(filename)
     print(" del: ", filename)
 
@@ -264,24 +270,28 @@ def deletesimilarity(*pathlist_list):
                 deleteall(data[indexsecond], deletelist[indexsecond])  # 删除图片
 
 
+
 class DeRepeat:
 
     def __init__(self):
-        self.image_urls, self.image_filepathes = DBAPI.getImageToDerepeat()
-        self.deRepeatedUrls, self.deRepeatedFilepathes = DBAPI.getImageDerepeated()
+        self.db_instance = DBDownload()
+        self.image_filepathes = self.db_instance.findAllToDerepeat()
+        self.deRepeatedFilepathes = self.db_instance.findAllDerepeated()
         pass
 
     def deRepeat(self):
-        if len(self.image_filepathes) < 1:
+        if len(self.image_filepathes) < 10:
             return
         try:
             deletesimilarity(self.image_filepathes)
+            self.image_filepathes = self.db_instance.findAllNoSelfRepeat()
             deletesimilarity(self.image_filepathes, self.deRepeatedFilepathes)
+            self.db_instance.setAllNoRepeat()
         except Exception as err:
             print("查重出错：" + str(err))
+            return
             pass
-        for filepath in self.image_filepathes:
-            DBAPI.setDownloadFlagByFilepath(filepath, DBAPI.DOWNLOAD_FLAG_NO_REPEAT)
+
         pass
 
     pass

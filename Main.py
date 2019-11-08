@@ -16,7 +16,7 @@ def mkdir(path):
 
 
 if __name__ == '__main__':
-    savepath = "/home/letmesleep/data/test"
+    savepath = "/home/letmesleep/data/demo"
     mkdir(savepath)
 
     # key_words = ['夜市', '集贸市场','观众','婚礼现场']
@@ -28,10 +28,10 @@ if __name__ == '__main__':
     #20191103
     # key_words = ['卡通脸', '漫画脸', '动漫古风']
     # key_words = ['漫画男人形象', '漫画女人形象', '漫画小孩形象']
-    key_words = ['可爱']
+    key_words = ['小老鼠']
 
 
-    limit = 40
+    limit = 300
 
     WebCrawler.goToFind(key_words, limit)
     print("\r爬取完毕，正在下载")
