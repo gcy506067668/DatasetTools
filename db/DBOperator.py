@@ -4,24 +4,25 @@ from db.dbconfig import DBConfig
 
 class DBBase:
     def __init__(self):
-        self.conn = ConnPool().getConn()
-        self.cursor = self.conn.cursor()
         pass
 
     def execute(self, sql):
-
-        self.cursor.execute(sql)
-        self.conn.commit()
+        conn = ConnPool().getConn()
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        conn.commit()
         pass
 
     def executeWithReturn(self, sql, fetchSize=-1):
-        self.cursor.execute(sql)
+        conn = ConnPool().getConn()
+        cursor = conn.cursor()
+        cursor.execute(sql)
         if fetchSize == 1:
-            return self.cursor.fetchone()
+            return cursor.fetchone()
         elif fetchSize == -1:
-            return self.cursor.fetchall()
+            return cursor.fetchall()
         else:
-            return self.cursor.fetchmany(fetchSize)
+            return cursor.fetchmany(fetchSize)
 
     pass
 
@@ -96,7 +97,7 @@ class DBDownload(DBBase):
         res = self.executeWithReturn(sql)
         urls = []
         if res:
-            for item in urls:
+            for item in res:
                 urls.append(str(item["d_filepath"], encoding='utf8'))
         return urls
         pass
@@ -106,7 +107,7 @@ class DBDownload(DBBase):
         res = self.executeWithReturn(sql)
         urls = []
         if res:
-            for item in urls:
+            for item in res:
                 urls.append(str(item["d_filepath"], encoding='utf8'))
         return urls
         pass
@@ -116,7 +117,7 @@ class DBDownload(DBBase):
         res = self.executeWithReturn(sql)
         urls = []
         if res:
-            for item in urls:
+            for item in res:
                 urls.append(str(item["d_filepath"], encoding='utf8'))
         return urls
         pass
@@ -126,7 +127,7 @@ class DBDownload(DBBase):
         res = self.executeWithReturn(sql)
         urls = []
         if res:
-            for item in urls:
+            for item in res:
                 urls.append(str(item["d_filepath"], encoding='utf8'))
         return urls
         pass
@@ -136,7 +137,7 @@ class DBDownload(DBBase):
         res = self.executeWithReturn(sql)
         urls = []
         if res:
-            for item in urls:
+            for item in res:
                 urls.append(str(item["d_filepath"], encoding='utf8'))
         return urls
         pass

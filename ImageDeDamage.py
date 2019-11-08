@@ -8,7 +8,6 @@ import cv2 as cv
 def clean():
     db_download_instance = DBDownload()
     images = db_download_instance.findAllToDeDamage()
-    print(len(images))
     image_nums = str(len(images))
     for cindex, image_path in enumerate(images):
 

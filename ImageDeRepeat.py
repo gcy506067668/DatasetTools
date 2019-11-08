@@ -120,9 +120,9 @@ def readall(data, deletelist):
             continue
         tmp = cv2.resize(tmp, (46, 46), interpolation=cv2.INTER_CUBIC)  # 缩放图片
         img[currIndex] = tmp
-        for index, item in enumerate(img):
-            if item is 0 or item is None:
-                print(data[index])
+        # for index, item in enumerate(img):
+        #     if item is 0 or item is None:
+        #         print(data[index])
 
     return img
 
@@ -135,8 +135,8 @@ def deleteall(data, deletelist):
                 pass
             except BaseException:
                 continue
-        else:
-            DBDownload().updateFlag(DBDownload.DOWNLOAD_FLAG_NO_SELFREPEAT, os.path.join(data[index]))
+        # else:
+        #     DBDownload().updateFlag(DBDownload.DOWNLOAD_FLAG_NO_SELFREPEAT, os.path.join(data[index]))
 
 
 def delete(filename):
@@ -192,6 +192,10 @@ def calculate2(img, data, label, deletelist, ux, uxx, vx):
 
 
 def deletesimilarity(*pathlist_list):
+
+    for item in pathlist_list:
+        if len(item) < 8:
+            return
     # 此处修改进程数 其他自动计算 不必修改
     processnum = 4
 
@@ -224,6 +228,7 @@ def deletesimilarity(*pathlist_list):
             if indexfirst >= indexsecond and not len(data) == 1: continue
 
             num = len(img[indexfirst])
+
             # 特殊算法求分割位置保证任务平均分配
             for i in range(processnum, -1, -1):
                 if i == processnum:
@@ -280,12 +285,15 @@ class DeRepeat:
         pass
 
     def deRepeat(self):
-        if len(self.image_filepathes) < 10:
-            return
         try:
+            for item in self.image_filepathes:
+                self.db_instance.updateFlag(DBDownload.DOWNLOAD_FLAG_NO_SELFREPEAT, item)
+
             deletesimilarity(self.image_filepathes)
             self.image_filepathes = self.db_instance.findAllNoSelfRepeat()
+
             deletesimilarity(self.image_filepathes, self.deRepeatedFilepathes)
+
             self.db_instance.setAllNoRepeat()
         except Exception as err:
             print("查重出错：" + str(err))

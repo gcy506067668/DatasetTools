@@ -9,9 +9,9 @@ class DBConfig:
     maxusage = None  # 单个连接最大复用次数
 
     #mysql config
-    host = "******"
+    host = "10.25.0.246"
     port = 3306
-    username = "*****"
-    password = "*****"
+    username = "gcy"
+    password = "12345678"
     dbname = "center_datasets"
     charset = "utf8"
