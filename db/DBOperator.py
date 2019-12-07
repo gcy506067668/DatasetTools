@@ -1,6 +1,35 @@
-from db.URLDatabase import ConnPool
+import pymysql
+from DBUtils.PooledDB import PooledDB
+from pymysql.cursors import DictCursor
+
 from db.dbconfig import DBConfig
 
+
+class ConnPool:
+    __pool = None
+
+    def __new__(cls, *args, **kw):
+        """single instance"""
+        if not hasattr(cls, '_instance'):
+            orig = super(ConnPool, cls)
+            cls._instance = orig.__new__(cls, *args, **kw)
+            cls.__pool = PooledDB(creator=pymysql,
+                                  mincached=DBConfig.mincached,
+                                  maxcached=DBConfig.maxcached,
+                                  host=DBConfig.host,
+                                  port=DBConfig.port,
+                                  user=DBConfig.username,
+                                  passwd=DBConfig.password,
+                                  db=DBConfig.dbname,
+                                  use_unicode=False,
+                                  charset=DBConfig.charset,
+                                  cursorclass=DictCursor)
+
+        return cls._instance
+
+    def getConn(self):
+        return self.__pool.connection()
+        pass
 
 class DBBase:
     def __init__(self):

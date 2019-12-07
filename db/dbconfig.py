@@ -13,5 +13,5 @@ class DBConfig:
     port = 3306
     username = "gcy"
     password = "12345678"
-    dbname = "center_datasets"
+    dbname = "url_db"
     charset = "utf8"

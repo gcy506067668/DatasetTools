@@ -1,16 +1,8 @@
 import os
 import requests
-from db.DBOperator import DBDownload
-from db.DBOperator import DBUrl
-from concurrent.futures import ThreadPoolExecutor
-
 
 class Download:
-
-    def __init__(self, savepath):
-        self.DBAPI = DBDownload()
-        self.DBURL = DBUrl()
-        self.imageToDownload = DBUrl().findAllToDownload()
+    def __init__(self, savepath, imglist):
         self.IMG_EXTENSIONS = [
             '.jpg', '.JPG', '.jpeg', '.JPEG',
             '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP',
@@ -18,13 +10,14 @@ class Download:
         self.savepath = savepath
         if not os.path.exists(savepath):
             os.mkdir(savepath)
+        self.imageToDownload = imglist
         pass
+
 
     def __download(self, urls, t_num):
         try:
             length = str(len(urls))
             for index, url in enumerate(urls):
-
                 i_savepath = self.savepath + "/" + str(url["u_label"], encoding='utf8')
                 if not os.path.exists(self.savepath):
                     os.mkdir(self.savepath)
@@ -63,7 +56,6 @@ class Download:
                 pic = requests.get(url, timeout=3)
 
         except BaseException:
-            self.DBURL.updateFlag(url, DBUrl.URL_FLAG_DOWNLOAD_ERROR)
             print('\033[31m\r错误，当前图片无法下载：\033[0m' + url)
             return False, ""
 
@@ -85,8 +77,6 @@ class Download:
             fp = open(download_file_path, 'wb')
             fp.write(pic.content)
             fp.close()
-            self.DBAPI.addDownload(url, download_file_path, label)
-            self.DBURL.updateFlag(url, DBUrl.URL_FLAG_DOWNLOAD_SUCCESS)
             return True, download_file_path
 
 class Downloader:

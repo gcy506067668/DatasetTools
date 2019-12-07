@@ -1,19 +1,13 @@
-# python
-# -*- coding: utf-8 -*-
-# @Time    : 2019/9/17 12:03
-# @Author  : dyt
-import os, time
+import os
 import cv2
 import numpy as np
 import math
 from scipy.ndimage import uniform_filter, gaussian_filter
 from skimage.util.dtype import dtype_range
 from skimage.util.arraycrop import crop
-from skimage._shared.utils import warn
-
 from multiprocessing import Process, Array
 
-from db.DBOperator import DBDownload
+from tqdm import tqdm
 
 
 def getfeature(img):
@@ -141,7 +135,6 @@ def deleteall(data, deletelist):
 
 def delete(filename):
     '''删除文件'''
-    DBDownload().updateFlag(DBDownload.DOWNLOAD_FLAG_REPEAT, filename)
     os.remove(filename)
     print(" del: ", filename)
 
@@ -163,7 +156,6 @@ def calculate(img, data, begin, end, label, deletelist, ux, uxx, vx):
                     deletelist[currIndex2] = 1
         if currIndex % 10 == 0:
             deleteall(data, deletelist)  # 一边运行一边删除
-
 
 
 def calculate2(img, data, label, deletelist, ux, uxx, vx):
@@ -190,9 +182,7 @@ def calculate2(img, data, label, deletelist, ux, uxx, vx):
                 deletelistscond[currIndex2] = 1
 
 
-
 def deletesimilarity(*pathlist_list):
-
     for item in pathlist_list:
         if len(item) < 8:
             return
@@ -242,7 +232,6 @@ def deletesimilarity(*pathlist_list):
             for i in range(processnum + 1):
                 loc[i] = num - loclength[processnum - i]
 
-
             pro = []
             if len(data) == 1:  # 处理自我查重
                 # 添加线程
@@ -275,31 +264,43 @@ def deletesimilarity(*pathlist_list):
                 deleteall(data[indexsecond], deletelist[indexsecond])  # 删除图片
 
 
+IMG_EXTENSIONS = [
+    '.jpg', '.JPG', '.jpeg', '.JPEG',
+    '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP',
+]
 
-class DeRepeat:
 
-    def __init__(self):
-        self.db_instance = DBDownload()
-        self.image_filepathes = self.db_instance.findAllToDerepeat()
-        self.deRepeatedFilepathes = self.db_instance.findAllDerepeated()
-        pass
+def is_image_file(filename):
+    return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
-    def deRepeat(self):
-        try:
-            for item in self.image_filepathes:
-                self.db_instance.updateFlag(DBDownload.DOWNLOAD_FLAG_NO_SELFREPEAT, item)
 
-            deletesimilarity(self.image_filepathes)
-            self.image_filepathes = self.db_instance.findAllNoSelfRepeat()
+def make_dataset(dir):
+    images = []
+    if not os.path.isdir(dir):
+        return images
+    for root, _, fnames in sorted(os.walk(dir)):
+        for fname in fnames:
+            if is_image_file(fname):
+                path = os.path.join(root, fname)
+                images.append(path)
 
-            deletesimilarity(self.image_filepathes, self.deRepeatedFilepathes)
+    return images
 
-            self.db_instance.setAllNoRepeat()
-        except Exception as err:
-            print("查重出错：" + str(err))
-            return
-            pass
 
-        pass
+if __name__ == '__main__':
 
-    pass
+    dirs = os.listdir("./")
+
+    for index, item in enumerate(dirs):
+        print("----------------------", end="")
+        print(index, end="")
+        print("----------------------")
+        if index < 24:
+            continue
+        images = make_dataset("./" + item)
+        if len(images) < 5:
+            continue
+        # p = Process(target=deletesimilarity, args=(images))
+        # p.start
+        deletesimilarity(images)
+
