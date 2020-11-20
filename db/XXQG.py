@@ -2,7 +2,7 @@ import time
 
 import autopy
 
-
+# 学习强国 1920 * 1080 屏幕 开浏览器最大化，登录学习强国，运行
 def watch_news(num_news):
     time.sleep(2)
 
@@ -65,4 +65,3 @@ def watch_video(num_video):
 watch_news(2)
 watch_video(2)
 watch_news(2)
-

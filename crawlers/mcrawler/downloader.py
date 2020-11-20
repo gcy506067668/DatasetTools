@@ -257,12 +257,12 @@ class ImageDownloader(Downloader):
             return False
         if max_size and not self._size_lt(img.size, max_size):
             return False
-        try:
-            if DBOperator.DBUrl().addURL(task['file_url']):
-                return True
-            else:
-                return False
-        except:
+        # try:
+        #     if DBOperator.DBUrl().addURL(task['file_url']):
+        #         return True
+        #     else:
+        #         return False
+        # except:
             return True
 
     def get_filename(self, task, default_ext):
